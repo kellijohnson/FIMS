@@ -45,7 +45,8 @@ methods::setClass(
     estimates = "tbl_df",
     number_of_parameters = "integer",
     timing = "difftime",
-    version = "package_version"
+    version = "package_version",
+    finalized_fims = "character"
   )
 )
 
@@ -250,6 +251,16 @@ methods::setGeneric("get_version", function(x) standardGeneric("get_version"))
 #' @keywords fit_fims
 methods::setMethod("get_version", "FIMSFit", function(x) x@version)
 
+#' @return
+#' [get_finalized_fims()] returns the finalized FIMS output as a JSON list.
+#' @export
+#' @rdname get_FIMSFit
+#' @keywords fit_fims
+methods::setGeneric("get_finalized_fims", function(x) standardGeneric("get_finalized_fims"))
+#' @rdname get_FIMSFit
+#' @keywords fit_fims
+methods::setMethod("get_finalized_fims", "FIMSFit", function(x) x@finalized_fims)
+
 # methods::setValidity ----
 
 methods::setValidity(
@@ -358,6 +369,7 @@ FIMSFit <- function(
     sdreport = list(),
     timing = c("time_total" = as.difftime(0, units = "secs")),
     version = utils::packageVersion("FIMS")) {
+  
   # Determine the number of parameters
   n_total <- length(obj[["env"]][["last.par.best"]])
   n_fixed_effects <- length(obj[["par"]])
@@ -402,7 +414,7 @@ FIMSFit <- function(
     opt = opt,
     parameter_names = parameter_names
   )
-
+  
   # Create JSON output for FIMS run
   finalized_fims <- input[["model"]]$get_output()
   # Reshape the JSON estimates
@@ -434,7 +446,8 @@ FIMSFit <- function(
     estimates = estimates,
     number_of_parameters = number_of_parameters,
     timing = timing,
-    version = version
+    version = version,
+    finalized_fims = finalized_fims
   )
   fit
 }
