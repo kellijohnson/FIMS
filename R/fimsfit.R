@@ -21,7 +21,6 @@ utils::globalVariables(c(
 
 # TODO: Fix "no metadata object found to revise superClass" in sdreportOrList
 # TODO: Write more validity checks for FIMSFit
-# TODO: Better document the return of [get_estimates()], i.e., columns
 # TODO: Make a helper function to add lower and upper CI for users in estimates
 
 # methods::setClass: ----
@@ -45,7 +44,8 @@ methods::setClass(
     estimates = "tbl_df",
     number_of_parameters = "integer",
     timing = "difftime",
-    version = "package_version"
+    version = "package_version",
+    model_output = "character"
   )
 )
 
@@ -58,7 +58,6 @@ methods::setMethod(
     cli::cli_inform(c(
       "i" = "The object is of the class FIMSFit v.{get_version(object)}",
       "i" = "The slots can be accessed using {.fn get_*} functions, e.g.,",
-      "*" = "{.fn get_estimates}",
       "*" = "{.fn get_obj}",
       "*" = "{.fn get_version}",
       "i" = "The following slots are available: {methods::slotNames(object)}.",
@@ -199,17 +198,6 @@ methods::setGeneric("get_sdreport", function(x) standardGeneric("get_sdreport"))
 methods::setMethod("get_sdreport", "FIMSFit", function(x) x@sdreport)
 
 #' @return
-#' [get_estimates()] returns a tibble of parameter values and their
-#' uncertainties from a fitted model.
-#' @export
-#' @rdname get_FIMSFit
-#' @keywords fit_fims
-methods::setGeneric("get_estimates", function(x) standardGeneric("get_estimates"))
-#' @rdname get_FIMSFit
-#' @keywords fit_fims
-methods::setMethod("get_estimates", "FIMSFit", function(x) x@estimates)
-
-#' @return
 #' [get_number_of_parameters()] returns a vector of integers specifying the
 #' number of fixed-effect parameters and the number of random-effect parameters
 #' in the model.
@@ -249,6 +237,16 @@ methods::setGeneric("get_version", function(x) standardGeneric("get_version"))
 #' @rdname get_FIMSFit
 #' @keywords fit_fims
 methods::setMethod("get_version", "FIMSFit", function(x) x@version)
+
+#' @return
+#' [get_model_output()] returns the finalized FIMS output as a JSON list.
+#' @export
+#' @rdname get_FIMSFit
+#' @keywords fit_fims
+methods::setGeneric("get_model_output", function(x) standardGeneric("get_model_output"))
+#' @rdname get_FIMSFit
+#' @keywords fit_fims
+methods::setMethod("get_model_output", "FIMSFit", function(x) x@model_output)
 
 # methods::setValidity ----
 
@@ -358,6 +356,7 @@ FIMSFit <- function(
     sdreport = list(),
     timing = c("time_total" = as.difftime(0, units = "secs")),
     version = utils::packageVersion("FIMS")) {
+  
   # Determine the number of parameters
   n_total <- length(obj[["env"]][["last.par.best"]])
   n_fixed_effects <- length(obj[["par"]])
@@ -402,11 +401,11 @@ FIMSFit <- function(
     opt = opt,
     parameter_names = parameter_names
   )
-
+  
   # Create JSON output for FIMS run
-  finalized_fims <- input[["model"]]$get_output()
+  model_output <- input[["model"]]$get_output()
   # Reshape the JSON estimates
-  json_estimates <- reshape_json_estimates(finalized_fims)
+  json_estimates <- reshape_json_estimates(model_output)
   # Merge json_estimates into tmb_estimates based on parameter id
   # TODO: Need uncertainty from TMB for derived quantities
   # TODO: change order of columns
@@ -431,10 +430,10 @@ FIMSFit <- function(
     max_gradient = max_gradient,
     report = report,
     sdreport = sdreport,
-    estimates = estimates,
     number_of_parameters = number_of_parameters,
     timing = timing,
-    version = version
+    version = version,
+    model_output = model_output
   )
   fit
 }

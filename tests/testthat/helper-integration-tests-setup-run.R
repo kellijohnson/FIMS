@@ -312,11 +312,11 @@ prepare_test_data <- function() {
   clear()
 
   # Save FIMS results as a test fixture for additional fimsfit tests
-  saveRDS(
-    fit_lengthcomp,
-    file = testthat::test_path("fixtures", "fit_lengthcomp.RDS"),
-    compress = FALSE
-  )
+  # saveRDS(
+  #   fit_lengthcomp,
+  #   file = testthat::test_path("fixtures", "fit_lengthcomp.RDS"),
+  #   compress = FALSE
+  # )
 
   # Load a second dataset that contains missing length composition data
   data_length_comp_na <- readRDS(test_path("fixtures", "data_length_comp_na.RDS"))
