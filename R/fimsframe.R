@@ -591,6 +591,12 @@ validate_data_colnames <- function(data) {
   if (!"timing" %in% the_column_names) {
     errors <- c(errors, "data must contain 'timing'")
   }
+  if (!"value" %in% the_column_names) {
+    errors <- c(errors, "data must contain 'value'")
+  }
+  if (!"unit" %in% the_column_names) {
+    errors <- c(errors, "data must contain 'unit'")
+  }
   if (!any(c("age", "length") %in% the_column_names)) {
     errors <- c(errors, "data must contain 'ages' and/or 'lengths'")
   }
