@@ -335,7 +335,6 @@ data1 <- rbind(landings_data, index_data, age_data, weight_at_age_data) |>
   )
 
 # Extract timing and fleets from milestone 1 data
-start_date <- timingfishery[["timing"]]
 observers <- c("fleet1", "survey1")
 
 # Create data frame for new fleet and year-specific length at age conversion
@@ -345,20 +344,20 @@ length_age_data <- data.frame(
   type = "age-to-length-conversion",
   name = rep(
     sort(rep(observers, length(len_bins) * length(ages))),
-    length(start_date)
+    length(timingfishery[["timing"]])
   ),
   age = rep(
     sort(rep(ages, length(len_bins))),
-    length(observers) * length(start_date)
+    length(observers) * length(timingfishery[["timing"]])
   ),
   length = rep(
     len_bins,
-    length(ages) * length(observers) * length(start_date)
+    length(ages) * length(observers) * length(timingfishery[["timing"]])
   ),
-  timing = returned_om[["om_input"]][["year"]],
+  timing = timingfishery[["timing"]],
   value = rep(
     c(t(returned_om[["em_input"]][["age_to_length_conversion"]])),
-    length(observers) * length(start_date)
+    length(observers) * length(timingfishery[["timing"]])
   ),
   unit = "proportion",
   uncertainty = rep(
@@ -366,7 +365,7 @@ length_age_data <- data.frame(
       em_input[["n.L.lengthcomp"]][["fleet1"]],
       em_input[["n.survey.lengthcomp"]][["survey1"]]
     ),
-    length(len_bins) * length(ages) * length(start_date)
+    length(len_bins) * length(ages) * length(timingfishery[["timing"]])
   )
 )
 
@@ -374,10 +373,10 @@ length_age_data <- data.frame(
 # the age composition data
 length_comp_data <- data.frame(
   type = "length_comp",
-  name = sort(rep(observers, length(len_bins) * length(start_date))),
+  name = sort(rep(observers, length(len_bins) * length(timingfishery[["timing"]]))),
   age = NA,
-  length = rep(len_bins, length(start_date) * length(observers)),
-  timing = returned_om[["om_input"]][["year"]],
+  length = rep(len_bins, length(timingfishery[["timing"]]) * length(observers)),
+  timing = timingfishery[["timing"]],
   value = c(
     c(t(returned_om[["em_input"]][["L.length.obs"]][["fleet1"]])),
     c(t(returned_om[["em_input"]][["survey.length.obs"]][["survey1"]]))
@@ -388,7 +387,7 @@ length_comp_data <- data.frame(
       em_input[["n.L.lengthcomp"]][["fleet1"]],
       em_input[["n.survey.lengthcomp"]][["survey1"]]
     ),
-    length(len_bins) * length(start_date)
+    length(len_bins) * length(timingfishery[["timing"]])
   )
 )
 
